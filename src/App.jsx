@@ -18,7 +18,7 @@ import ResumePage from './pages/ResumePage';
 
 // Import styles
 import './styles/global.css';
-import './styles/spinner.css';
+import './styles/Spinner.css';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
