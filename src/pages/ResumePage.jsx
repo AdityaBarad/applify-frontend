@@ -1,12 +1,13 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
-import { FiUser, FiEdit2, FiSave, FiPlus, FiTrash2, FiLoader, FiUploadCloud, FiFile, FiBriefcase, FiAward, FiStar, FiGlobe, FiDollarSign, FiMapPin, FiClock } from 'react-icons/fi';
+import { FiUser, FiEdit2, FiSave, FiPlus, FiTrash2, FiLoader, FiUploadCloud, FiFile, FiBriefcase, FiAward, FiStar, FiGlobe, FiDollarSign, FiMapPin, FiClock, FiLock } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { parseResume } from '../utils/resumeParser';
 
 function ResumePage() {
-  const { user, getUserProfile, updateUserProfile } = useAuth();
+  const { user, getUserProfile, updateUserProfile, subscription, subscriptionLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [parseLoading, setParseLoading] = useState(false);
@@ -37,50 +38,24 @@ function ResumePage() {
       preferredIndustries: []
     }
   });
-  
-  // Temp states for adding new items
-  const [newSkill, setNewSkill] = useState('');
-  const [newLanguage, setNewLanguage] = useState({ language: '', proficiency: 'Beginner' });
-  const [newEducation, setNewEducation] = useState({
-    institution: '',
-    degree: '',
-    fieldOfStudy: '',
-    startDate: '',
-    endDate: '',
-    currentlyStudying: false,
-    description: ''
-  });
-  const [newExperience, setNewExperience] = useState({
-    company: '',
-    position: '',
-    location: '',
-    startDate: '',
-    endDate: '',
-    currentlyWorking: false,
-    description: ''
-  });
-  const [newIndustry, setNewIndustry] = useState('');
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-      
       try {
         setLoading(true);
         const profileData = await getUserProfile();
-        
         if (profileData) {
-          setProfile({
-            ...profile,
+          setProfile(prev => ({
+            ...prev,
             ...profileData,
-            // Ensure all expected objects exist
-            socialLinks: profileData.socialLinks || profile.socialLinks,
-            jobPreferences: profileData.jobPreferences || profile.jobPreferences,
+            socialLinks: profileData.socialLinks || prev.socialLinks,
+            jobPreferences: profileData.jobPreferences || prev.jobPreferences,
             workExperience: profileData.workExperience || [],
             education: profileData.education || [],
             skills: profileData.skills || [],
             languages: profileData.languages || []
-          });
+          }));
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -89,7 +64,6 @@ function ResumePage() {
         setLoading(false);
       }
     };
-    
     fetchProfile();
   }, [user, getUserProfile]);
   
@@ -332,6 +306,32 @@ function ResumePage() {
       </div>
     );
   }
+  
+  // Restrict access to Elite plan only
+  if (subscriptionLoading || loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="spinner-container inline-block mx-auto" style={{width: "40px", height: "40px"}}>
+            <div className="spinner"></div>
+          </div>
+          <p className="text-gray-600 font-medium mt-3">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isElite = subscription && subscription.subscription_plans && subscription.subscription_plans.name === 'Elite';
+  if (!isElite) {
+    return (
+      <div className="max-w-xl mx-auto mt-20 bg-white rounded-xl shadow-lg p-8 text-center border border-gray-200">
+        <h2 className="text-2xl font-bold mb-4 text-gray-900">Elite Plan Required</h2>
+        <p className="text-gray-600 mb-6">The Resume Builder is available exclusively for Elite plan members. Upgrade to Elite to unlock this feature and build a professional resume with advanced tools.</p>
+        <a href="/pricing" className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-lg transition">Upgrade to Elite</a>
+      </div>
+    );
+  }
+            
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">

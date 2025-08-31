@@ -15,17 +15,37 @@ import AutomationForm from './pages/AutomationForm';
 import PricingPage from './pages/PricingPage';
 import ProfilePage from './pages/ProfilePage';
 import ResumePage from './pages/ResumePage';
+import HowToUsePage from './pages/HowToUsePage';
+import TelegramOpportunitiesPage from './pages/TelegramOpportunitiesPage';
+import AuthCallback from './pages/AuthCallback';
+import JobDatingPage from './pages/JobDatingPage';
+
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 // Import styles
 import './styles/global.css';
-import './styles/Spinner.css';
+import './styles/spinner.css';
+import { useEffect } from 'react';
 
 function PrivateRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  // If still loading auth state, don't redirect yet
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+  
+  // Redirect to login if not authenticated
   return user ? children : <Navigate to="/login" />;
 }
 
 function App() {
+  useEffect(() => {
+    document.title = 'Applify - Automated Job Applications';
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -54,6 +74,7 @@ function App() {
         />
 
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -61,31 +82,28 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/email-verification" element={<EmailVerification />} />
           <Route path="/pricing" element={<PricingPage />} />
-          <Route 
-            path="/dashboard/*" 
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/dashboard/automate/:platform" 
-            element={
-              <PrivateRoute>
-                <AutomationForm />
-              </PrivateRoute>
-            } 
-          />
-          <Route path="/dashboard" element={<Dashboard />}>
-            <Route index element={<Navigate to="/dashboard/automate" replace />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          
+          {/* Protected dashboard routes */}
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>}>
+            <Route index element={<AutomatePage />} />
             <Route path="automate" element={<AutomatePage />} />
             <Route path="manage" element={<ManagePage />} />
             <Route path="jobs" element={<JobDetailsPage />} />
+            <Route path="telegram" element={<TelegramOpportunitiesPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="resume" element={<ResumePage />} />
-            <Route path="billing" element={<ManagePage />} /> {/* Replace with actual billing page when created */}
+            <Route path="how-to-use" element={<HowToUsePage />} />
+            <Route path="job-dating" element={<JobDatingPage />} />
+            <Route path="billing" element={<ManagePage />} />
           </Route>
+          
+          {/* Protected standalone routes */}
+          <Route path="/dashboard/automate/:platform" element={<PrivateRoute><AutomationForm /></PrivateRoute>} />
+          
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

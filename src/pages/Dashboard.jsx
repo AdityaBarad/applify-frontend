@@ -3,10 +3,91 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiMenu, FiX, FiHome, FiSettings, FiLogOut, FiBell, 
   FiUser, FiCreditCard, FiBriefcase, FiFile, FiChevronDown,
-  FiBarChart2, FiHelpCircle, FiGrid
+  FiBarChart2, FiHelpCircle, FiGrid, FiMessageSquare,
+  FiZap, FiClock, FiTarget, FiActivity
 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import logo from '../assets/logo-blue.png'; // Use blue logo for dashboard
+
+// Platform-specific color utility - updating with more professional color scheme
+export const getPlatformColors = (platform) => {
+  const colorMap = {
+    linkedin: {
+      bg: 'bg-blue-100',
+      text: 'text-blue-800',
+      border: 'border-blue-200',
+      gradient: {
+        from: 'from-blue-600',
+        to: 'to-blue-700'
+      },
+      shadow: 'shadow-blue-300/30',
+      icon: 'text-blue-600',
+      hex: '#2563eb' // blue-600
+    },
+    indeed: {
+      bg: 'bg-emerald-100',
+      text: 'text-emerald-800',
+      border: 'border-emerald-200',
+      gradient: {
+        from: 'from-emerald-600',
+        to: 'to-teal-700'
+      },
+      shadow: 'shadow-emerald-300/30',
+      icon: 'text-emerald-600',
+      hex: '#059669' // emerald-600
+    },
+    internshala: {
+      bg: 'bg-red-100',
+      text: 'text-red-800',
+      border: 'border-red-200',
+      gradient: {
+        from: 'from-red-600',
+        to: 'to-rose-700'
+      },
+      shadow: 'shadow-red-300/30',
+      icon: 'text-red-600',
+      hex: '#dc2626' // red-600
+    },
+    unstop: {
+      bg: 'bg-amber-100',
+      text: 'text-amber-800',
+      border: 'border-amber-200',
+      gradient: {
+        from: 'from-amber-500',
+        to: 'to-orange-600'
+      },
+      shadow: 'shadow-amber-300/30',
+      icon: 'text-amber-600',
+      hex: '#d97706' // amber-600
+    },
+    naukri: {
+      bg: 'bg-purple-100',
+      text: 'text-purple-800',
+      border: 'border-purple-200',
+      gradient: {
+        from: 'from-purple-600',
+        to: 'to-fuchsia-700'
+      },
+      shadow: 'shadow-purple-300/30',
+      icon: 'text-purple-600',
+      hex: '#9333ea' // purple-600
+    }
+  };
+
+  return colorMap[platform?.toLowerCase()] || {
+    bg: 'bg-slate-100',
+    text: 'text-slate-800',
+    border: 'border-slate-200',
+    gradient: {
+      from: 'from-slate-600',
+      to: 'to-slate-700'
+    },
+    shadow: 'shadow-slate-300/30',
+    icon: 'text-slate-600',
+    hex: '#475569' // slate-600
+  };
+};
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -14,7 +95,7 @@ function Dashboard() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, subscription } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,18 +131,33 @@ function Dashboard() {
     const path = location.pathname;
     if (path.includes('/automate')) return 'Automate Job Applications';
     if (path.includes('/jobs')) return 'Applied Jobs';
-    if (path.includes('/manage')) return 'Application Analytics';
+    if (path.includes('/manage')) return 'Sessions';
+    if (path.includes('/telegram')) return 'Latest Opportunities';
     if (path.includes('/resume')) return 'Resume Builder';
     if (path.includes('/profile')) return 'Account Settings';
     if (path.includes('/billing')) return 'Billing & Subscription';
     return 'Dashboard';
   };
 
+  // Get user's subscription plan name
+  const getPlanName = () => {
+    if (!subscription) return 'Free Plan';
+    
+    if (subscription.subscription_plans?.name) {
+      return `${subscription.subscription_plans.name} Plan`;
+    }
+    
+    // Default to Premium Plan as currently active
+    return 'Premium Plan';
+  };
+
   // Menu links configuration
   const menuLinks = [
-    { path: "/dashboard/automate", icon: FiHome, label: "Automate" },
+    { path: "/dashboard/automate", icon: FiZap, label: "Automate" },
     { path: "/dashboard/jobs", icon: FiBriefcase, label: "Applied Jobs" },
-    { path: "/dashboard/manage", icon: FiBarChart2, label: "Analytics" },
+    { path: "/dashboard/job-dating", icon: FiBarChart2, label: "Job Dating (Beta)" },
+    { path: "/dashboard/manage", icon: FiActivity, label: "Sessions" },
+    { path: "/dashboard/telegram", icon: FiTarget, label: "Opportunities" },
     { path: "/dashboard/resume", icon: FiFile, label: "Resume" },
     { divider: true },
     { path: "/dashboard/profile", icon: FiUser, label: "Account" },
@@ -76,19 +172,32 @@ function Dashboard() {
           sidebarOpen ? 'w-64' : 'w-20'
         } z-20 fixed h-full`}
       >
-        <div className="p-4 flex items-center justify-between border-b border-gray-100">
-          {sidebarOpen && (
-            <h1 className="text-xl font-bold">
-              <span className="gradient-text">JobAutoPilot</span>
-            </h1>
+        <div className={`p-4 flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'} border-b border-gray-100`}>
+          {sidebarOpen ? (
+            <div className="flex items-center">
+              <img src={logo} alt="JobAutoPilot Logo" className="h-10 w-auto mr-2" />
+              <h1 className="text-2xl font-bold">
+                <span className="gradient-text">Applify</span>
+              </h1>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)} 
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle sidebar"
+            >
+              <FiMenu size={22} />
+            </button>
           )}
-          <button 
-            onClick={() => setSidebarOpen(!sidebarOpen)} 
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="Toggle sidebar"
-          >
-            {sidebarOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-          </button>
+          {sidebarOpen && (
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)} 
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle sidebar"
+            >
+              <FiX size={22} />
+            </button>
+          )}
         </div>
         
         <div className="flex flex-col flex-1 overflow-y-auto py-6">
@@ -106,32 +215,40 @@ function Dashboard() {
                     ${sidebarOpen ? 'justify-start' : 'justify-center'}
                   `}
                 >
-                  <item.icon size={20} />
-                  {sidebarOpen && <span>{item.label}</span>}
-                  {!sidebarOpen && (
-                    <span className="absolute left-full ml-3 transform -translate-x-3 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                      {item.label}
-                    </span>
+                  {!sidebarOpen ? (
+                    <div className="flex justify-center items-center w-full" style={{margin: 0, padding: 0}}>
+                      <item.icon size={20} style={{margin: 0, marginRight: 0}} />
+                    </div>
+                  ) : (
+                    <>
+                      <item.icon size={20} className="mr-3" />
+                      <span>{item.label}</span>
+                    </>
                   )}
                 </NavLink>
               )
             )}
-          </nav>
-          
-          <div className="px-3 mt-auto">
-            <button 
-              onClick={handleLogout} 
-              className={`sidebar-link w-full text-left text-red-600 hover:bg-red-50 flex ${sidebarOpen ? 'justify-start' : 'justify-center'} group`}
+            {/* Add this where the sidebar navigation items are defined */}
+            <NavLink
+              to="/dashboard/how-to-use"
+              className={({ isActive }) => `
+                sidebar-link group
+                ${isActive ? 'bg-primary-50 text-primary-700' : ''}
+                ${sidebarOpen ? 'justify-start' : 'justify-center'}
+              `}
             >
-              <FiLogOut size={20} />
-              {sidebarOpen && <span>Logout</span>}
-              {!sidebarOpen && (
-                <span className="absolute left-full ml-3 transform -translate-x-3 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                  Logout
-                </span>
+              {!sidebarOpen ? (
+                <div className="flex justify-center items-center w-full" style={{margin: 0, padding: 0}}>
+                  <FiHelpCircle size={20} style={{margin: 0, marginRight: 0}} />
+                </div>
+              ) : (
+                <>
+                  <FiHelpCircle size={20} className="mr-3" />
+                  <span>How to Use</span>
+                </>
               )}
-            </button>
-          </div>
+            </NavLink>
+          </nav>
         </div>
       </aside>
 
@@ -156,9 +273,12 @@ function Dashboard() {
                 className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-30 overflow-y-auto"
               >
                 <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                  <h1 className="text-xl font-bold">
-                    <span className="gradient-text">JobAutoPilot</span>
-                  </h1>
+                  <div className="flex items-center">
+                    <img src={logo} alt="JobAutoPilot Logo" className="h-10 w-auto mr-2" />
+                    <h1 className="text-2xl font-bold">
+                      <span className="gradient-text">Applify</span>
+                    </h1>
+                  </div>
                   <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-lg hover:bg-gray-100">
                     <FiX size={24} />
                   </button>
@@ -172,7 +292,7 @@ function Dashboard() {
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">{user.email}</p>
-                        <p className="text-xs text-gray-500">Free Plan</p>
+                        <p className="text-xs text-gray-500">{getPlanName()}</p>
                       </div>
                     </div>
                   </div>
@@ -197,14 +317,6 @@ function Dashboard() {
                       </NavLink>
                     )
                   )}
-
-                  <button 
-                    onClick={handleLogout} 
-                    className="w-full flex items-center px-3 py-2.5 mt-6 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <FiLogOut size={20} className="mr-3" />
-                    <span>Logout</span>
-                  </button>
                 </nav>
               </motion.div>
             </>
@@ -216,28 +328,28 @@ function Dashboard() {
       <div className={`flex-1 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'} transition-all duration-300`}>
         {/* Top Bar */}
         <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-          <div className="flex items-center justify-between px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-2.5">
             <div className="flex items-center">
               <button 
                 onClick={() => setMobileMenuOpen(true)} 
-                className="p-2 rounded-lg mr-3 hover:bg-gray-100 transition-colors md:hidden"
+                className="p-1.5 rounded-lg mr-3 hover:bg-gray-100 transition-colors md:hidden"
                 aria-label="Open menu"
               >
-                <FiMenu size={22} />
+                <FiMenu size={20} />
               </button>
-              <h2 className="text-lg sm:text-xl font-semibold">{getPageTitle()}</h2>
+              <h2 className="text-base sm:text-lg font-medium">{getPageTitle()}</h2>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               {/* Notifications */}
               <div className="relative">
                 <button 
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative"
                   onClick={() => setNotificationOpen(!notificationOpen)}
                 >
-                  <FiBell size={20} />
+                  <FiBell size={18} />
                   {notifications.some(n => !n.read) && (
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
                 </button>
                 
@@ -283,13 +395,13 @@ function Dashboard() {
               {/* User Menu */}
               <div className="relative">
                 <button 
-                  className="flex items-center space-x-1 rounded-lg hover:bg-gray-100 transition-colors p-1.5"
+                  className="flex items-center space-x-1 rounded-lg hover:bg-gray-100 transition-colors p-1"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">
+                  <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium text-sm">
                     {getInitial()}
                   </div>
-                  <FiChevronDown size={16} className="text-gray-500" />
+                  <FiChevronDown size={14} className="text-gray-500" />
                 </button>
                 
                 <AnimatePresence>
@@ -303,7 +415,9 @@ function Dashboard() {
                     >
                       <div className="px-4 py-3 border-b border-gray-200">
                         <p className="font-medium text-gray-800">{user?.email}</p>
-                        <p className="text-xs text-gray-500 mt-1">Free plan user</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {getPlanName()}
+                        </p>
                       </div>
                       <div className="py-1">
                         <NavLink 
@@ -350,6 +464,10 @@ function Dashboard() {
         <main className="px-4 sm:px-6 md:px-8 py-6">
           <Outlet />
         </main>
+
+        <div className="px-4 py-2">
+          <span className="text-xs text-gray-500">© 2023 Applify</span>
+        </div>
       </div>
     </div>
   );

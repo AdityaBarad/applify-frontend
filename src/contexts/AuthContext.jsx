@@ -53,54 +53,38 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (email, password, profileData = {}) => {
+    // Check if email is already registered and verified
+    const { data: existingProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, email_verified')
+      .eq('email', email)
+      .single();
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      // Only throw if it's not a "no rows" error
+      throw profileError;
+    }
+
+    if (existingProfile && existingProfile.email_verified) {
+      throw new Error('Email already registered and verified. Please log in.');
+    }
+
     // Register a new user with Supabase
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          ...profileData
+              fullName: profileData.fullName || '',
+              phone: profileData.phone || ''
         },
-        emailRedirectTo: `${window.location.origin}/email-verification`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         // Force email verification by setting this to FALSE
         emailConfirm: false
       }
     });
     
     if (error) throw error;
-    
-    // If successful, manually trigger verification email if needed
-    if (data?.user && !data.user.email_confirmed_at) {
-      try {
-        // Optionally force a verification email resend
-        await supabase.auth.resend({
-          type: 'signup',
-          email: email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/email-verification`,
-          }
-        });
-        console.log("Verification email resent");
-      } catch (resendError) {
-        console.error('Error sending verification email:', resendError);
-      }
-    }
-    
-    // Create a profile entry if registration was successful
-    if (data?.user) {
-      try {
-        await profileService.updateProfile(data.user.id, {
-          id: data.user.id,
-          email: data.user.email,
-          full_name: profileData.fullName || '',
-          created_at: new Date().toISOString(),
-          email_verified: false // Track email verification status
-        });
-      } catch (profileError) {
-        console.error('Error creating profile:', profileError);
-        // We don't throw here to not block the registration flow
-      }
-    }
     
     return data;
   };
@@ -193,7 +177,7 @@ export function AuthProvider({ children }) {
       console.log(`Completing session ${currentSession.id} with ${jobsApplied} jobs applied`);
       
       // Get the current actual jobs_applied count from the database first
-      const { data: currentSession } = await supabase
+      const { data: sessionData } = await supabase
         .from('automation_sessions')
         .select('jobs_applied')
         .eq('id', currentSession.id)
@@ -222,14 +206,13 @@ export function AuthProvider({ children }) {
   };
 
   // Check if user can apply to more jobs
-  const checkJobApplicationLimit = async () => {
+  // Strict check: monthly and daily per-platform
+  const checkJobApplicationLimit = async (platform = null) => {
     if (!user) {
       return { canApply: false, message: 'You must be logged in' };
     }
-    
     try {
-      const { hasReached, limit, used } = await subscriptionService.hasReachedLimit(user.id);
-      
+      const { hasReached, limit, used, dailyHasReached, dailyLimit, dailyUsed } = await subscriptionService.hasReachedLimit(user.id, platform);
       if (hasReached) {
         return {
           canApply: false,
@@ -238,12 +221,20 @@ export function AuthProvider({ children }) {
           used
         };
       }
-      
+      if (dailyHasReached) {
+        return {
+          canApply: false,
+          message: `You've reached your daily limit of ${dailyLimit} applications for ${platform.charAt(0).toUpperCase() + platform.slice(1)}`,
+          limit: dailyLimit,
+          used: dailyUsed
+        };
+      }
+      // If both limits are fine
       return {
-        canApply: true, 
-        message: `You've used ${used} of ${limit} job applications this month`,
-        limit,
-        used
+        canApply: true,
+        message: `You've used ${used} of ${limit} job applications this month. Today: ${dailyUsed}/${dailyLimit ?? '∞'} for ${platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : ''}`,
+        limit: dailyLimit ?? limit,
+        used: dailyUsed ?? used
       };
     } catch (error) {
       console.error('Error checking job application limit:', error);
@@ -256,7 +247,10 @@ export function AuthProvider({ children }) {
     if (!user) return null;
     
     try {
-      return await subscriptionService.getApplicationStats(user.id, period);
+      console.log(`Fetching stats for period: ${period}, user ID: ${user.id}`);
+      const stats = await subscriptionService.getApplicationStats(user.id, period);
+      console.log(`Found ${stats?.recentSessions?.length || 0} sessions`);
+      return stats;
     } catch (error) {
       console.error('Error getting application statistics:', error);
       return null;
@@ -318,6 +312,19 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Update job application status
+  const updateJobStatus = async (jobId, newStatus) => {
+    if (!user) throw new Error('User must be logged in');
+    
+    try {
+      const updatedJob = await subscriptionService.updateJobStatus(jobId, newStatus);
+      return updatedJob;
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -339,7 +346,8 @@ export function AuthProvider({ children }) {
       processSubscriptionPayment,
       incrementJobApplicationCount,
       getUserProfile,
-      updateUserProfile
+      updateUserProfile,
+      updateJobStatus
     }}>
       {!loading && children}
     </AuthContext.Provider>

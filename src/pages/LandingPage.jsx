@@ -21,14 +21,23 @@ import {
   FiTwitter,
   FiInstagram,
   FiChevronDown,
-  FiPlay
+  FiPlay,
+  FiMousePointer,
+  FiLock,
+  FiSettings,
+  FiLayers,
+  FiCode,
+  FiShield,
+  FiPieChart
 } from 'react-icons/fi';
 import { useInView } from 'react-intersection-observer';
+import logo from '../assets/logo-blue.png'; // Use blue logo for hero section
+import appScreenshot from '../assets/app-screenshot.png';
+// import appScreenshot from '../assets/app-screenshot.png'; // Add app screenshot image
 
 function LandingPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('monthly');
-  const [activeQuestion, setActiveQuestion] = useState(null);
   
   // Animation hooks using react-intersection-observer
   const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
@@ -37,7 +46,6 @@ function LandingPage() {
   const [howItWorksRef, howItWorksInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [testimonialsRef, testimonialsInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [pricingRef, pricingInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [faqRef, faqInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [ctaRef, ctaInView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   // Scroll to top on page load
@@ -45,13 +53,19 @@ function LandingPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Platforms data
+  // Updated platforms data
   const platforms = [
     {
       name: 'LinkedIn',
       icon: FiLinkedin,
       color: 'bg-blue-600',
-      description: 'Apply to jobs on the world\'s largest professional network'
+      description: 'Automate applications across the world\'s largest professional network'
+    },
+    {
+      name: 'Internshala',
+      icon: FiBookOpen,
+      color: 'bg-green-600',
+      description: 'Find and apply to the best internships and early career opportunities'
     },
     {
       name: 'Indeed',
@@ -60,86 +74,20 @@ function LandingPage() {
       description: 'Streamline applications on one of the most popular job sites'
     },
     {
-      name: 'Unstop',
-      icon: FiAward,
-      color: 'bg-violet-600',
-      description: 'Access exclusive opportunities for fresh graduates'
-    },
-    {
-      name: 'Internshala',
-      icon: FiBookOpen,
-      color: 'bg-green-600',
-      description: 'Find the best internships and early career opportunities'
-    },
-    {
       name: 'Naukri',
       icon: FiGlobe,
       color: 'bg-purple-600',
       description: 'Connect with top employers in India and beyond'
+    },
+    {
+      name: 'Unstop',
+      icon: FiAward,
+      color: 'bg-violet-600',
+      description: 'Access exclusive opportunities for fresh graduates'
     }
   ];
 
-  // Testimonials data
-  const testimonials = [
-    {
-      name: 'Sarah K.',
-      position: 'UX Designer',
-      company: 'hired at Google',
-      image: 'https://randomuser.me/api/portraits/women/44.jpg',
-      text: 'JobAutoPilot completely transformed my job search. I was able to apply to over 50 positions in one day, and within a week I had 5 interview requests. The time I saved was invaluable!'
-    },
-    {
-      name: 'Raj M.',
-      position: 'Software Engineer',
-      company: 'hired at Microsoft',
-      image: 'https://randomuser.me/api/portraits/men/32.jpg',
-      text: 'As a developer, I appreciate efficient solutions. JobAutoPilot is exactly that for job hunting. I got my dream role at Microsoft after automating applications to over 100 positions.'
-    },
-    {
-      name: 'Priya N.',
-      position: 'Data Analyst',
-      company: 'hired at Amazon',
-      image: 'https://randomuser.me/api/portraits/women/68.jpg',
-      text: 'The metrics and analytics JobAutoPilot provides helped me understand which applications were performing best. This insight was crucial in landing my role at Amazon.'
-    },
-    {
-      name: 'James T.',
-      position: 'Marketing Specialist',
-      company: 'hired at Adobe',
-      image: 'https://randomuser.me/api/portraits/men/62.jpg',
-      text: 'I was skeptical at first, but JobAutoPilot exceeded my expectations. The personalized matching feature saved me from applying to jobs that werent a good fit.'
-    }
-  ];
-
-  // FAQ data
-  const faqs = [
-    {
-      question: 'How does JobAutoPilot work?',
-      answer: 'JobAutoPilot connects to major job platforms through our browser extension. Once you set your preferences and keywords, our AI technology helps you find and apply to relevant positions automatically, saving you countless hours of manual work.'
-    },
-    {
-      question: 'Is my data secure?',
-      answer: 'Yes, we take data security very seriously. We use industry-standard encryption and security measures to protect your personal information. We never share your data with third parties without your explicit consent.'
-    },
-    {
-      question: 'What platforms do you support?',
-      answer: 'We currently support LinkedIn, Indeed, Unstop, Internshala, and Naukri. Were constantly working on adding more platforms based on user feedback and demand.'
-    },
-    {
-      question: 'How many jobs can I apply to?',
-      answer: 'The number of jobs you can apply to depends on your subscription plan. Our Basic plan allows for 50 applications per month, Standard for 200, and Premium for unlimited applications.'
-    },
-    {
-      question: 'Can I cancel my subscription?',
-      answer: 'Yes, you can cancel your subscription at any time. Youll continue to have access to your plan features until the end of your current billing period.'
-    },
-    {
-      question: 'How do I get started?',
-      answer: 'Getting started is easy! Just create an account, choose a subscription plan, install our browser extension, and begin setting up your preferences. Our onboarding process will guide you through each step.'
-    }
-  ];
-
-  // Pricing plans data
+  // Updated pricing plans data to match PricingPage
   const pricingPlans = {
     monthly: [
       {
@@ -147,28 +95,30 @@ function LandingPage() {
         price: '₹499',
         period: 'month',
         features: [
-          'Apply to 50 jobs per month',
+          'Apply to up to 50 jobs per month',
           'Access to all job platforms',
           'Email notifications',
           'Basic analytics',
           'Standard support'
         ],
         buttonText: 'Get Started',
-        isPopular: false
+        isPopular: false,
+        description: 'Essential features to get started'
       },
       {
         name: 'Standard',
         price: '₹999',
         period: 'month',
         features: [
-          'Apply to 200 jobs per month',
-          'All Basic features',
-          'Advanced filtering options',
+          'Apply to up to 200 jobs per month',
+          'Access to all job platforms',
+          'Email notifications',
           'Priority support',
-          'Resume optimization'
+          'Advanced filtering options'
         ],
         buttonText: 'Get Started',
-        isPopular: true
+        isPopular: true,
+        description: 'Perfect for active job seekers'
       },
       {
         name: 'Premium',
@@ -176,13 +126,14 @@ function LandingPage() {
         period: 'month',
         features: [
           'Unlimited job applications',
-          'All Standard features',
-          'AI-powered job matching',
-          'Interview preparation tools',
-          '24/7 priority support'
+          'Access to all job platforms',
+          'Email notifications',
+          'Priority support',
+          'Advanced filtering options'
         ],
         buttonText: 'Get Started',
-        isPopular: false
+        isPopular: false,
+        description: 'For professionals seeking the best opportunities'
       }
     ],
     annual: [
@@ -191,7 +142,7 @@ function LandingPage() {
         price: '₹399',
         period: 'month',
         features: [
-          'Apply to 50 jobs per month',
+          'Apply to up to 50 jobs per month',
           'Access to all job platforms',
           'Email notifications',
           'Basic analytics',
@@ -199,22 +150,24 @@ function LandingPage() {
         ],
         buttonText: 'Get Started',
         isPopular: false,
-        savings: 'Save ₹1,200 yearly'
+        savings: 'Save ₹1,200 yearly',
+        description: 'Essential features to get started'
       },
       {
         name: 'Standard',
         price: '₹799',
         period: 'month',
         features: [
-          'Apply to 200 jobs per month',
-          'All Basic features',
-          'Advanced filtering options',
+          'Apply to up to 200 jobs per month',
+          'Access to all job platforms',
+          'Email notifications',
           'Priority support',
-          'Resume optimization'
+          'Advanced filtering options'
         ],
         buttonText: 'Get Started',
         isPopular: true,
-        savings: 'Save ₹2,400 yearly'
+        savings: 'Save ₹2,400 yearly',
+        description: 'Perfect for active job seekers'
       },
       {
         name: 'Premium',
@@ -222,41 +175,100 @@ function LandingPage() {
         period: 'month',
         features: [
           'Unlimited job applications',
-          'All Standard features',
-          'AI-powered job matching',
-          'Interview preparation tools',
-          '24/7 priority support'
+          'Access to all job platforms',
+          'Email notifications',
+          'Priority support',
+          'Advanced filtering options'
         ],
         buttonText: 'Get Started',
         isPopular: false,
-        savings: 'Save ₹4,800 yearly'
+        savings: 'Save ₹4,800 yearly',
+        description: 'For professionals seeking the best opportunities'
       }
     ]
   };
 
-  // Process steps data
+  // Updated process steps data
   const processSteps = [
     {
-      title: 'Sign Up & Install',
-      description: 'Create an account and install our browser extension in just a few clicks.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/2580/2580805.png'
+      title: 'Install the Applify extension',
+      description: 'Add our browser extension with a single click for seamless automation.',
+      icon: FiCode
     },
     {
-      title: 'Set Preferences',
-      description: 'Customize your job search criteria, keywords, and application preferences.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/3580/3580378.png'
+      title: 'Sign up and set preferences',
+      description: 'Create an account and customize your job search criteria in minutes.',
+      icon: FiUser
     },
     {
-      title: 'Automate Applications',
-      description: 'Let our AI find and apply to the most relevant positions for you.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/8764/8764188.png'
+      title: 'Fill your details once',
+      description: 'Enter your profile information once, and well handle the rest.',
+      icon: FiSettings
     },
     {
-      title: 'Track Your Progress',
-      description: 'Monitor your application status and analytics through our dashboard.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/6671/6671938.png'
+      title: 'Click "Automate"',
+      description: 'Let Applify find and apply to relevant jobs with one click.',
+      icon: FiMousePointer
+    },
+    {
+      title: 'Track and manage applications',
+      description: 'Monitor your progress and success through our intuitive dashboard.',
+      icon: FiBarChart
     }
   ];
+
+  // Key features data
+  const keyFeatures = [
+    {
+      title: '1-Click Job Automation',
+      description: 'Apply to hundreds of jobs instantly with a single click.',
+      icon: FiMousePointer,
+      color: 'bg-blue-100 text-blue-600'
+    },
+    {
+      title: 'Smart Extension',
+      description: 'Works seamlessly with your browser and Applify Web dashboard.',
+      icon: FiCode,
+      color: 'bg-indigo-100 text-indigo-600'
+    },
+    {
+      title: 'Personalized Job Matching',
+      description: 'Apply to perfectly matched to your profile and skills.',
+      icon: FiTarget,
+      color: 'bg-purple-100 text-purple-600'
+    },
+    {
+      title: 'Application Tracker',
+      description: 'Track all applied jobs in one unified dashboard for easy management.',
+      icon: FiPieChart,
+      color: 'bg-green-100 text-green-600'
+    },
+    {
+      title: 'Privacy First',
+      description: 'No data saved on our servers. All automation runs on your device.',
+      icon: FiShield,
+      color: 'bg-red-100 text-red-600'
+    },
+    {
+      title: 'Detailed Analytics',
+      description: 'Understand whats working and improve your job search strategy.',
+      icon: FiBarChart,
+      color: 'bg-amber-100 text-amber-600'
+    }
+  ];
+
+  // Why choose us data
+  const whyChooseUs = [
+    'Apply smarter and faster',
+    'Personalized job search',
+    'Private and secure',
+    'Boost selection chances'
+  ];
+
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-indigo-50 overflow-hidden">
@@ -265,9 +277,8 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-3xl font-bold">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">JobAutoPilot</span>
-              </h1>
+              <img src={logo} alt="Applify Logo" className="h-12 w-auto" />
+              <span className="ml-3 font-bold text-3xl text-gray-900">Applify</span>
             </div>
             
             {/* Desktop Navigation */}
@@ -275,9 +286,9 @@ function LandingPage() {
               <div className="ml-10 flex items-center space-x-8">
                 <a href="#features" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
                 <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">How It Works</a>
+                <a href="#platforms" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Supported Platforms</a>
                 <a href="#pricing" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Pricing</a>
-                <a href="#testimonials" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Testimonials</a>
-                <a href="#faq" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">FAQ</a>
+                {/* <a href="#testimonials" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Testimonials</a> */}
               </div>
             </div>
             
@@ -336,13 +347,6 @@ function LandingPage() {
               >
                 Testimonials
               </a>
-              <a 
-                href="#faq" 
-                className="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                FAQ
-              </a>
               <div className="border-t border-gray-100 pt-3 flex flex-col space-y-3">
                 <Link 
                   to="/login" 
@@ -365,9 +369,9 @@ function LandingPage() {
       </nav>
 
       <main>
-        {/* Hero Section */}
+        {/* Combined Hero Section with Extension Download */}
         <section 
-          className="relative pt-20 pb-32 overflow-hidden" 
+          className="relative pt-10 overflow-hidden" 
           ref={heroRef}
         >
           <div className="absolute inset-0 z-0">
@@ -391,88 +395,174 @@ function LandingPage() {
             </svg>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24 relative z-10">
-            <div className={`flex flex-col lg:flex-row items-center transition-all duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0 -translate-y-6'}`}>
-              {/* Hero Content */}
-              <div className="w-full lg:w-1/2 text-center lg:text-left mb-12 lg:mb-0 lg:pr-10">
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium text-sm mb-6">
-                  <span className="animate-pulse mr-2 h-2 w-2 rounded-full bg-blue-600"></span>
-                  Launching Soon • Join the Waitlist
-                </div>
-                <h1 className="text-5xl sm:text-6xl font-extrabold mb-6 leading-tight">
-                  Your Job Search on{' '}
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                    Autopilot
-                  </span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 relative z-10">
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center transition-all duration-1000 ${heroInView ? 'opacity-100' : 'opacity-0 -translate-y-6'}`}>
+              {/* Hero Content - Left Column */}
+              <div className="text-center lg:text-left">
+                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                  Applify <span className="text-blue-600">Autopilot</span>
                 </h1>
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  Automate your job applications across LinkedIn, Indeed, and more. Get hired faster while focusing on what matters most.
+                <p className="max-w-xl mt-5 mx-auto lg:mx-0 text-xl text-gray-600">
+                  Apply to hundreds of jobs with a single click. Applify automates your job hunt across LinkedIn, Internshala, and more.
                 </p>
-                <div className="flex flex-col sm:flex-row justify-center lg:justify-start items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Link 
-                    to="/register" 
-                    className="w-full sm:w-auto px-8 py-3 text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                    Start for Free
-                  </Link>
-                  <a 
-                    href="#how-it-works"
-                    className="w-full sm:w-auto flex items-center justify-center px-8 py-3 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg border border-gray-200 shadow-sm hover:shadow transition-all duration-300"
-                  >
-                    <FiPlay className="mr-2 text-blue-600" />
-                    See How It Works
-                  </a>
-                </div>
-                <div className="mt-8 text-sm text-gray-500 flex flex-col sm:flex-row items-center justify-center lg:justify-start">
-                  <div className="flex -space-x-2 mr-3 mb-2 sm:mb-0">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden">
-                        <img src={`https://randomuser.me/api/portraits/${i % 2 === 0 ? 'women' : 'men'}/${i * 10 + 10}.jpg`} alt="User" />
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <span className="text-blue-600 font-medium">5,000+</span> job seekers joined this month
-                  </div>
-                </div>
-              </div>
 
-              {/* Hero Image */}
-              <div className="w-full lg:w-1/2 relative">
-                <div className="relative z-10 rounded-xl shadow-2xl overflow-hidden bg-white border border-gray-100">
-                  <div className="h-6 bg-gray-100 flex items-center px-4 border-b">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                      <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <div className="mt-8 space-y-4">
+                  <h3 className="text-xl font-bold text-gray-800">Get started in two simple steps:</h3>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-3">
+                      1
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium">Install our Chrome extension</p>
+                      <p className="text-gray-600 text-sm">Required for automating your job applications</p>
                     </div>
                   </div>
-                  <img 
-                    src="https://res.cloudinary.com/practicaldev/image/fetch/s--LLJ6t-Kc--/c_imagga_scale,f_auto,fl_progressive,h_900,q_auto,w_1600/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7j8s2h4erdejm82dyyn7.png" 
-                    alt="JobAutoPilot Dashboard" 
-                    className="w-full object-cover"
-                  />
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-3">
+                      2
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium">Create your Applify account</p>
+                      <p className="text-gray-600 text-sm">To track and manage your applications</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute -bottom-10 -right-10 z-0 w-64 h-64 rounded-full bg-indigo-100 filter blur-3xl opacity-60"></div>
-                <div className="absolute -top-10 -left-10 z-0 w-64 h-64 rounded-full bg-blue-100 filter blur-3xl opacity-60"></div>
+
+                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <a 
+                    href="#" 
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download Chrome Extension
+                  </a>
+                  <Link 
+                    to="/register" 
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-base font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 shadow-sm hover:shadow transition-all duration-300"
+                  >
+                    Create Account
+                  </Link>
+                </div>
+                <p className="mt-4 text-sm text-gray-500">
+                  Works with Chrome, Edge, and other Chromium-based browsers
+                </p>
+              </div>
+
+              {/* Extension & Dashboard Preview - Right Column */}
+              <div className="relative flex flex-col gap-8">
+                {/* Extension Image */}
+                <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+                  <div className="h-10 bg-gray-100 flex items-center px-4 border-b">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="mx-auto bg-white/70 rounded-md px-3 py-1 text-xs text-gray-500">
+                      chrome://extensions/
+                    </div>
+                  </div>
+                  <div className="p-5 bg-white">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <img src={logo} alt="Applify Logo" className="h-10 w-auto mr-3" />
+                        <div>
+                          <h4 className="font-bold text-gray-900">Applify Extension</h4>
+                          <p className="text-xs text-gray-400">v1.0.0</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <a 
+                          href="#"
+                          className="inline-flex items-center justify-center px-3 py-1.5 rounded text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                        >
+                          Add to Chrome
+                        </a>
+                        <span className="mt-1 text-[10px] text-gray-400">10,000+ users • ★★★★★ (4.8)</span>
+                      </div>
+                    </div>
+                    {/* <img 
+                      src="https://www.webextensions.org/images/chrome-extensions-setup.png" 
+                      alt="Chrome Extension" 
+                      className="w-full h-auto rounded-md shadow-sm mb-4"
+                    /> */}
+                    {/* <div className="p-3 bg-green-50 border border-green-100 rounded-md flex items-center mb-3">
+                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                        <FiCheck size={18} />
+                      </div>
+                      <p className="text-green-800 text-sm">
+                        Applify extension installed successfully!
+                      </p>
+                    </div> */}
+                    {/* <div className="text-center">
+                      <a 
+                        href="#"
+                        className="inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                      >
+                        Add to Chrome
+                      </a>
+                      <p className="mt-2 text-xs text-gray-500">10,000+ users • ★★★★★ (4.8)</p>
+                    </div> */}
+                  </div>
+                </div>
+                {/* Dashboard Image */}
+                <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col items-center p-2">
+                  <img src={appScreenshot} alt="App Screenshot" />
+                  {/* <div className="mt-3 text-center">
+                    <span className="text-gray-700 font-medium">Dashboard</span>
+                  </div> */}
+                </div>
+                {/* Remove or comment out the decorative blur elements */}
+                {/* <div className="absolute -bottom-10 -right-10 z-0 w-64 h-64 rounded-full bg-indigo-100 filter blur-3xl opacity-60"></div>
+                <div className="absolute -top-10 -left-10 z-0 w-64 h-64 rounded-full bg-blue-100 filter blur-3xl opacity-60"></div> */}
+              </div>
+            </div>
+            
+            <div className="mt-16 text-center">
+              <h3 className="font-medium text-xl text-gray-900 mb-6">How Applify powers your job search</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white rounded-lg p-5 shadow-md">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full text-blue-600 flex items-center justify-center mx-auto mb-4">
+                    <FiMousePointer size={20} />
+                  </div>
+                  <h4 className="font-medium mb-2">One-Click Apply</h4>
+                  <p className="text-gray-600 text-sm">Apply to hundreds of jobs with our Chrome extension</p>
+                </div>
+                <div className="bg-white rounded-lg p-5 shadow-md">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full text-purple-600 flex items-center justify-center mx-auto mb-4">
+                    <FiTarget size={20} />
+                  </div>
+                  <h4 className="font-medium mb-2">Personalized  job Matching </h4>
+                  <p className="text-gray-600 text-sm">Apply to jobs perfectly matched to your profile</p>
+                </div>
+                <div className="bg-white rounded-lg p-5 shadow-md">
+                  <div className="w-12 h-12 bg-green-100 rounded-full text-green-600 flex items-center justify-center mx-auto mb-4">
+                    <FiBarChart size={20} />
+                  </div>
+                  <h4 className="font-medium mb-2">Track Everything</h4>
+                  <p className="text-gray-600 text-sm">Monitor applications and progress in one dashboard</p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Platform Logos */}
-          <div className="bg-gray-50 border-t border-b border-gray-100">
+          <div className="bg-white shadow-sm border-t border-gray-100 mt-8" id="platforms">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <div className="text-center mb-10">
-                <h3 className="text-gray-500 font-medium text-sm uppercase tracking-wider mb-3">
-                  Works with all major job platforms
+              <div className="text-center mb-8">
+                <h3 className="text-gray-900 font-medium text-xl mb-12">
+                  Platforms Supported
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-8 justify-items-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 justify-items-center">
                   {platforms.map((platform, index) => (
                     <div key={index} className="flex flex-col items-center">
-                      <div className={`w-12 h-12 ${platform.color} text-white rounded-full flex items-center justify-center mb-3`}>
-                        <platform.icon size={24} />
+                      <div className={`w-14 h-14 ${platform.color} text-white rounded-full flex items-center justify-center mb-3 shadow-lg`}>
+                        <platform.icon size={28} />
                       </div>
-                      <span className="text-gray-700 font-medium">{platform.name}</span>
+                      <span className="text-gray-800 font-medium text-lg">{platform.name}</span>
+                      {/* <p className="text-gray-500 text-sm mt-1 max-w-xs text-center">{platform.description}</p> */}
                     </div>
                   ))}
                 </div>
@@ -484,135 +574,68 @@ function LandingPage() {
         {/* Features Section */}
         <section 
           id="features" 
-          className="py-24 bg-white relative overflow-hidden"
+          className="py-5 bg-white relative overflow-hidden"
           ref={featuresRef}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-1000 delay-300 ${featuresInView ? 'opacity-100' : 'opacity-0 translate-y-6'}`}>
               <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Features</h2>
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">Everything You Need to Land Your Dream Job</h3>
-              <p className="text-xl text-gray-500">
-                Our comprehensive suite of tools helps you streamline your job search and maximize your chances of success.
+              <h3 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+                Everything you need to supercharge your job search
+              </h3>
+              <p className="text-xl text-gray-500 mt-4">
+                Applify combines automation with intelligent job matching to make your job hunt effortless and effective.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-              <div className={`bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 group ${featuresInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '150ms' }}>
-                <div className="bg-blue-100 group-hover:bg-blue-200 transition-colors duration-300 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
-                  <FiClock className="text-blue-600 text-2xl" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+              {keyFeatures.map((feature, index) => (
+                <div 
+                  key={index}
+                  className={`bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100 group ${featuresInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} 
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <div className={`${feature.color} w-14 h-14 rounded-lg flex items-center justify-center mb-6`}>
+                    <feature.icon className="text-2xl" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-4 group-hover:text-blue-600 transition-colors duration-300">{feature.title}</h3>
+                  <p className="text-gray-600">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold mb-4 group-hover:text-blue-600 transition-colors duration-300">Time Saving Automation</h3>
-                <p className="text-gray-600">
-                  Our intelligent automation applies to jobs for you 24/7, saving you countless hours of repetitive work. Apply to hundreds of positions in the time it takes to apply to one manually.
-                </p>
-              </div>
-
-              <div className={`bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 group ${featuresInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '300ms' }}>
-                <div className="bg-indigo-100 group-hover:bg-indigo-200 transition-colors duration-300 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
-                  <FiTarget className="text-indigo-600 text-2xl" />
-                </div>
-                <h3 className="text-xl font-bold mb-4 group-hover:text-indigo-600 transition-colors duration-300">Smart Job Matching</h3>
-                <p className="text-gray-600">
-                  Our AI algorithm analyzes job listings and your profile to match you with positions that align with your skills, experience, and preferences, ensuring better quality applications.
-                </p>
-              </div>
-
-              <div className={`bg-gradient-to-br from-purple-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 group ${featuresInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '450ms' }}>
-                <div className="bg-purple-100 group-hover:bg-purple-200 transition-colors duration-300 w-14 h-14 rounded-lg flex items-center justify-center mb-6">
-                  <FiBarChart className="text-purple-600 text-2xl" />
-                </div>
-                <h3 className="text-xl font-bold mb-4 group-hover:text-purple-600 transition-colors duration-300">Comprehensive Analytics</h3>
-                <p className="text-gray-600">
-                  Track your application success rate, interview conversions, and other key metrics through our intuitive dashboard to continuously improve your job search strategy.
-                </p>
-              </div>
+              ))}
             </div>
 
             <div className="mt-20">
               <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl overflow-hidden shadow-xl transition-all duration-1000 ${featuresInView ? 'opacity-100' : 'opacity-0 scale-95'}`} style={{ transitionDelay: '600ms' }}>
                 <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
                   <div className="p-12 lg:pl-16">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-6">Cross-Platform Integration</h3>
+                    <h3 className="text-3xl font-bold text-gray-900 mb-6">Why Choose Applify?</h3>
                     <p className="text-gray-600 mb-8 text-lg">
-                      JobAutoPilot seamlessly connects with all major job platforms, allowing you to manage your entire job search from a single dashboard.
+                      Applify is built with one goal in mind: to make your job search faster, smarter, and more effective.
                     </p>
                     <ul className="space-y-4 mb-8">
-                      {platforms.map((platform, index) => (
+                      {whyChooseUs.map((point, index) => (
                         <li key={index} className="flex items-start">
-                          <div className={`flex-shrink-0 ${platform.color} rounded-full p-1 mt-1 mr-3`}>
+                          <div className="flex-shrink-0 bg-blue-600 rounded-full p-1 mt-1 mr-3">
                             <FiCheck className="text-white" />
                           </div>
                           <div>
-                            <span className="font-medium text-gray-900">{platform.name}</span>
-                            <p className="text-sm text-gray-500">{platform.description}</p>
+                            <span className="font-medium text-gray-900">{point}</span>
                           </div>
                         </li>
                       ))}
                     </ul>
                     <Link to="/register" className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700">
-                      Get started with all platforms 
+                      Experience the Applify difference 
                       <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                       </svg>
                     </Link>
                   </div>
                   <div className="p-8 lg:p-0">
-                    <img src="https://cdn.dribbble.com/users/1615584/screenshots/17536686/media/f7a0d4c0a7b43a4382d6ca23c754d59d.png" 
-                         alt="Platform Integration" 
-                         className="w-full h-auto rounded-lg shadow-lg" />
+                      <img src={appScreenshot} alt="App Screenshot" />
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section 
-          className="py-20 bg-gradient-to-r from-blue-600 to-indigo-600 text-white relative overflow-hidden"
-          ref={statsRef}
-        >
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden opacity-10">
-            <svg className="absolute top-0 left-0 transform translate-x-[-10%] translate-y-[-10%]" width="800" height="800" fill="none" viewBox="0 0 800 800">
-              <circle cx="400" cy="400" r="400" fill="white" />
-            </svg>
-            <svg className="absolute bottom-0 right-0 transform translate-x-[30%] translate-y-[20%]" width="800" height="800" fill="none" viewBox="0 0 800 800">
-              <circle cx="400" cy="400" r="400" fill="white" />
-            </svg>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-1000 ${statsInView ? 'opacity-100' : 'opacity-0 translate-y-6'}`}>
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4">Trusted by thousands of job seekers</h2>
-              <p className="text-blue-100 text-lg">
-                Join the community of successful job seekers who found their dream jobs faster with JobAutoPilot.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-              <div className={`transition-all duration-700 ${statsInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '150ms' }}>
-                <div className="bg-white/10 rounded-lg p-8 backdrop-blur-md">
-                  <div className="text-5xl font-bold mb-2">500+</div>
-                  <div className="text-lg text-blue-100">Applications Automated Daily</div>
-                </div>
-              </div>
-              <div className={`transition-all duration-700 ${statsInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '300ms' }}>
-                <div className="bg-white/10 rounded-lg p-8 backdrop-blur-md">
-                  <div className="text-5xl font-bold mb-2">85%<div className="text-lg text-blue-100">Time Saved Per Application</div>
-                  </div>
-                </div>
-              </div>
-              <div className={`transition-all duration-700 ${statsInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '450ms' }}>
-                <div className="bg-white/10 rounded-lg p-8 backdrop-blur-md">
-                  <div className="text-5xl font-bold mb-2">50k+</div>
-                  <div className="text-lg text-blue-100">Happy Users</div>
-                </div>
-              </div>
-              <div className={`transition-all duration-700 ${statsInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '600ms' }}>
-                <div className="bg-white/10 rounded-lg p-8 backdrop-blur-md">
-                  <div className="text-5xl font-bold mb-2">3x</div>
-                  <div className="text-lg text-blue-100">More Interview Callbacks</div>
                 </div>
               </div>
             </div>
@@ -628,110 +651,52 @@ function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className={`text-center max-w-3xl mx-auto mb-20 transition-all duration-1000 ${howItWorksInView ? 'opacity-100' : 'opacity-0 translate-y-6'}`}>
               <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">How It Works</h2>
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">Simple Process, Powerful Results</h3>
+              <h3 className="text-4xl font-bold text-gray-900 mb-4">Get Started in Minutes</h3>
               <p className="text-xl text-gray-500">
-                Getting started with JobAutoPilot is easy. Follow these simple steps to transform your job search.
+                Applify streamlines your job search with a simple 5-step process that saves you hours of manual work.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {processSteps.map((step, index) => (
-                <div 
-                  key={index} 
-                  className={`relative transition-all duration-700 ${howItWorksInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} 
-                  style={{ transitionDelay: `${index * 150}ms` }}
-                >
-                  {/* Step number */}
-                  <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg z-10">
-                    {index + 1}
-                  </div>
-                  
-                  {/* Step content */}
-                  <div className="bg-white border border-gray-100 rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow h-full flex flex-col">
-                    <div className="mb-6 w-16 h-16">
-                      <img src={step.icon} alt={step.title} className="w-full h-full object-contain" />
-                    </div>
-                    <h4 className="text-xl font-bold mb-4 text-gray-900">{step.title}</h4>
-                    <p className="text-gray-600 flex-grow">{step.description}</p>
-                    
-                    {/* Connector arrow for all but the last step */}
-                    {index < processSteps.length - 1 && (
-                      <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+            <div className="relative">
+              {/* Process steps vertical line */}
+              <div className="absolute left-[2.25rem] lg:left-1/2 top-0 bottom-0 w-0.5 bg-blue-100 transform lg:-translate-x-1/2"></div>
+              
+              <div className="space-y-12">
+                {processSteps.map((step, index) => (
+                  <div 
+                    key={index} 
+                    className={`relative transition-all duration-700 ${howItWorksInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`} 
+                    style={{ transitionDelay: `${index * 150}ms` }}
+                  >
+                    <div className="flex items-center">
+                      {/* Step number */}
+                      <div className="absolute left-0 lg:left-1/2 -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold z-10 border-4 border-white shadow-xl">
+                        {index + 1}
                       </div>
-                    )}
+                      
+                      {/* Step content box - alternating left/right on large screens */}
+                      <div className={`ml-16 lg:ml-0 lg:w-5/12 ${index % 2 === 0 ? 'lg:mr-auto' : 'lg:ml-auto'} bg-white border border-gray-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all`}>
+                        <div className="flex items-center mb-4">
+                          <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4 flex-shrink-0">
+                            <step.icon size={20} />
+                          </div>
+                          <h4 className="text-xl font-bold text-gray-900">{step.title}</h4>
+                        </div>
+                        <p className="text-gray-600 ml-14">{step.description}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             
-            <div className={`mt-16 text-center transition-all duration-1000 delay-700 ${howItWorksInView ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`mt-20 text-center transition-all duration-1000 delay-700 ${howItWorksInView ? 'opacity-100' : 'opacity-0'}`}>
               <Link 
                 to="/register" 
                 className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                Get Started Today
+                Start Automating Today
               </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section 
-          id="testimonials" 
-          className="py-24 bg-gray-50"
-          ref={testimonialsRef}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-1000 ${testimonialsInView ? 'opacity-100' : 'opacity-0 translate-y-6'}`}>
-              <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Success Stories</h2>
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">From Job Seekers Like You</h3>
-              <p className="text-xl text-gray-500">
-                Don't just take our word for it. Hear from our users who found their dream jobs using JobAutoPilot.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div 
-                  key={index} 
-                  className={`bg-white rounded-xl shadow-lg p-8 border border-gray-100 transition-all duration-700 ${testimonialsInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 150}ms` }}
-                >
-                  <div className="flex items-center mb-6">
-                    <div className="mr-4">
-                      <img 
-                        src={testimonial.image} 
-                        alt={testimonial.name} 
-                        className="w-16 h-16 rounded-full object-cover border-2 border-blue-100" 
-                      />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold text-gray-900">{testimonial.name}</h4>
-                      <p className="text-gray-600">{testimonial.position}, <span className="text-blue-600">{testimonial.company}</span></p>
-                    </div>
-                  </div>
-                  <blockquote className="text-gray-700 italic mb-4">"{testimonial.text}"</blockquote>
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                        <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className={`mt-16 text-center transition-all duration-1000 delay-700 ${testimonialsInView ? 'opacity-100' : 'opacity-0 translate-y-6'}`}>
-              <a href="#" className="inline-flex items-center font-medium text-blue-600 hover:text-blue-800">
-                Read more success stories
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                </svg>
-              </a>
             </div>
           </div>
         </section>
@@ -824,55 +789,7 @@ function LandingPage() {
                 >
                   Contact Sales
                 </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section 
-          id="faq" 
-          className="py-24 bg-gray-50"
-          ref={faqRef}
-        >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`text-center mb-16 transition-all duration-1000 ${faqInView ? 'opacity-100' : 'opacity-0 translate-y-6'}`}>
-              <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">FAQ</h2>
-              <h3 className="text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h3>
-              <p className="text-xl text-gray-500">
-                Answers to the most common questions about JobAutoPilot.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div 
-                  key={index} 
-                  className={`bg-white rounded-lg shadow border border-gray-100 overflow-hidden transition-all duration-700 ${faqInView ? 'opacity-100' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
-                >
-                  <button
-                    className="flex justify-between items-center w-full px-6 py-5 text-left"
-                    onClick={() => setActiveQuestion(activeQuestion === index ? null : index)}
-                  >
-                    <span className="text-lg font-medium text-gray-900">{faq.question}</span>
-                    <FiChevronDown 
-                      className={`text-gray-500 transition-transform duration-300 ${activeQuestion === index ? 'transform rotate-180' : ''}`} 
-                    />
-                  </button>
-                  <div 
-                    className={`px-6 overflow-hidden transition-all duration-300 ${activeQuestion === index ? 'max-h-60 pb-6' : 'max-h-0'}`}
-                  >
-                    <p className="text-gray-600">{faq.answer}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className={`mt-12 text-center transition-all duration-1000 delay-700 ${faqInView ? 'opacity-100' : 'opacity-0'}`}>
-              <p className="text-gray-600">
-                Still have questions? <a href="/contact" className="text-blue-600 hover:text-blue-800 font-medium">Contact our support team</a>
-              </p>
+              </div >
             </div>
           </div>
         </section>
@@ -893,11 +810,12 @@ function LandingPage() {
 
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className={`text-center transition-all duration-1000 ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-                Ready to Transform Your Job Search?
+              <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                <span className="block">Ready to automate your job search?</span>
+                <span className="block">Start with Applify today.</span>
               </h2>
               <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-                Join thousands of job seekers who have already found their dream jobs faster and easier with JobAutoPilot.
+                Join thousands of job seekers who are saving time and getting more interviews with Applify.
               </p>
               <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Link 
@@ -910,11 +828,11 @@ function LandingPage() {
                   to="/demo" 
                   className="w-full sm:w-auto bg-transparent text-white border border-white hover:bg-white/10 px-8 py-3 rounded-lg font-medium transition-colors duration-300"
                 >
-                  Request a Demo
+                  See How It Works
                 </Link>
               </div>
               <p className="text-blue-200 mt-6 text-sm">
-                No credit card required for free trial • Cancel anytime
+                No credit card required • Install in seconds • Start applying today
               </p>
             </div>
           </div>
@@ -926,7 +844,10 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold mb-6">JobAutoPilot</h2>
+              <div className="flex items-center mb-6">
+                <img src={logo} alt="Applify Logo" className="h-10 w-auto bg-white rounded-md p-1" />
+                <h2 className="text-2xl font-bold ml-3 text-white">Applify</h2>
+              </div>
               <p className="text-gray-400 mb-6 pr-8">
                 Automate your job search and focus on what matters most. Our platform helps you apply to jobs across multiple platforms with a single click.
               </p>
@@ -950,24 +871,22 @@ function LandingPage() {
               <ul className="space-y-3">
                 <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
                 <li><a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Enterprise</a></li>
+                <li><a href="#platforms" className="text-gray-400 hover:text-white transition-colors">Supported Platforms</a></li>
+                {/* Removed How It Works */}
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-6">Resources</h3>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Job Search Tips</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Success Stories</a></li>
-                <li><a href="#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="#how-it-works" className="text-gray-400 hover:text-white transition-colors">How It Works</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">How to Use</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-6">Company</h3>
               <ul className="space-y-3">
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                {/* Removed Careers */}
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
@@ -977,8 +896,9 @@ function LandingPage() {
           
           <div className="pt-8 mt-8 border-t border-gray-800 text-sm text-gray-400">
             <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-4 md:mb-0">
-                <p>© 2024 JobAutoPilot. All rights reserved.</p>
+              <div className="mb-4 md:mb-0 flex items-center">
+                <img src={logo} alt="Applify Logo" className="h-6 w-auto mr-2 bg-white rounded p-0.5" />
+                <p>© 2024 Applify. All rights reserved.</p>
               </div>
               <div className="flex items-center space-x-6">
                 <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

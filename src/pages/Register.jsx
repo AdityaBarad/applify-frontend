@@ -4,9 +4,11 @@ import { FiMail, FiLock, FiUser, FiAlertCircle, FiGithub, FiLinkedin, FiLoader }
 import { FcGoogle } from 'react-icons/fc'; // Import Google icon
 import { useAuth } from '../contexts/AuthContext';
 import { checkSupabaseConfig } from '../utils/supabaseConfigChecker';
+import logo from '../assets/logo.png'; // Adjust the path as necessary
 
 function Register() {
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,21 +37,22 @@ function Register() {
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+    if (!phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^\+?[0-9]{7,15}$/.test(phone)) {
+      newErrors.phone = 'Phone number is invalid';
+    }
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
     if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
     if (!acceptTerms) {
       newErrors.acceptTerms = 'You must accept the terms and conditions';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -64,7 +67,7 @@ function Register() {
     try {
       setLoading(true);
       console.log("Starting registration process for:", email);
-      const result = await register(email, password, { fullName });
+  const result = await register(email, password, { fullName, phone });
       console.log("Registration result:", result);
       
       // Always navigate to the verification page regardless of whether email was confirmed
@@ -92,9 +95,17 @@ function Register() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Create an account</h2>
-          <p className="mt-2 text-gray-600">Start your automation journey</p>
+        <div className="text-center">
+          <img className="mx-auto h-16 w-auto" src={logo} alt="Applify Logo" /> {/* Increased from h-12 to h-16 */}
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create your Applify account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              sign in to your existing account
+            </Link>
+          </p>
         </div>
         
         {errors.submit && (
@@ -126,6 +137,25 @@ function Register() {
               />
             </div>
             {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                className={`form-input ${errors.phone ? 'border-red-300' : ''}`}
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
           </div>
           
           <div>

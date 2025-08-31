@@ -63,7 +63,7 @@ function ManagePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Manage Automation History</h1>
+      {/* <h1 className="text-2xl font-bold mb-6">Manage Automation History</h1> */}
 
       {/* Analytics Component */}
       <div className="mb-8">
@@ -71,7 +71,7 @@ function ManagePage() {
       </div>
       
       {/* Session History */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-5 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-medium text-gray-900">Automation History</h2>
@@ -166,8 +166,8 @@ function ManagePage() {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        )} */}
+      {/* </div> */}
     </div>
   );
 }

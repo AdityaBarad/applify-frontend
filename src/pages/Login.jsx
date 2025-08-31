@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiAlertCircle, FiLoader } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc'; // Import Google icon
 import { useAuth } from '../contexts/AuthContext';
+import logo from '../assets/logo-blue.png';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -10,8 +11,15 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const { login, loginWithProvider } = useAuth();
+  const { login, loginWithProvider, user } = useAuth();
   const navigate = useNavigate();
+
+  // Check if user is already logged in and redirect to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,9 +57,17 @@ function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
+        <div className="text-center">
+          <img className="mx-auto h-16 w-auto" src={logo} alt="Applify Logo" /> {/* Increased from h-12 to h-16 */}
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to Applify
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+              create a new account
+            </Link>
+          </p>
         </div>
         
         {error && (
@@ -165,13 +181,6 @@ function Login() {
             </button>
           </div>
         </div>
-        
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 hover:text-blue-500 font-medium">
-            Register here
-          </Link>
-        </p>
       </div>
     </div>
   );

@@ -5,11 +5,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { subscriptionService } from '../lib/supabaseClient';
 import { motion } from 'framer-motion';
 
-function SubscriptionStatus() {
+function SubscriptionStatus({ compact = false }) {
   const { user, subscription, subscriptionLoading } = useAuth();
   const [usageData, setUsageData] = useState({ used: 0, limit: 30 });
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(!compact);
 
   useEffect(() => {
     if (!user) return;
@@ -52,11 +52,40 @@ function SubscriptionStatus() {
   const remainingApplications = usageData.limit - usageData.used;
 
   if (subscriptionLoading || loading) {
-    return (
+    return compact ? (
+      <div className="flex items-center gap-2">
+        <FiLoader className="animate-spin text-primary-600" size={16} />
+        <span className="text-sm text-gray-600">Loading...</span>
+      </div>
+    ) : (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center justify-center h-32">
         <FiLoader className="animate-spin text-primary-600 mr-3" size={22} />
         <span className="text-gray-600 font-medium">Loading subscription data...</span>
       </div>
+    );
+  }
+
+  if (compact) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center gap-3 text-sm"
+      >
+        <div className="bg-primary-50 px-2.5 py-1 rounded-lg text-primary-700 font-medium flex items-center">
+          <span>{subscription ? subscription.subscription_plans.name : 'Basic'}</span>
+        </div>
+        <div className="text-gray-600 flex items-center">
+          <span className="font-medium">{usageData.used}/{usageData.limit}</span>
+          <span className="ml-1">applications</span>
+        </div>
+        <Link 
+          to="/pricing" 
+          className="text-primary-600 hover:text-primary-700 font-medium"
+        >
+          Upgrade
+        </Link>
+      </motion.div>
     );
   }
 

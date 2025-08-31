@@ -169,40 +169,111 @@ const subscriptionService = {
 
   // Get application statistics for analytics
   async getApplicationStats(userId, period = 'month') {
-    const today = new Date();
-    let startDate;
-    
-    // Calculate the start date based on the requested period
-    switch(period) {
-      case 'day':
-        startDate = new Date(today.setHours(0, 0, 0, 0));
-        break;
-      case 'week':
-        const dayOfWeek = today.getDay();
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - dayOfWeek);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case 'month':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        break;
-      case 'year':
-        startDate = new Date(today.getFullYear(), 0, 1);
-        break;
-      default:
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const now = new Date();
+    let startDate, endDate;
+
+    console.log(`Building query for userId: ${userId}, period: ${period}`);
+
+    // First, try to check if there are any records for this user
+    const { count, error: countError } = await supabase
+      .from('automation_sessions')
+      .select('*', { count: 'exact', head: true })
+      .eq('profile_id', userId);
+
+    if (countError) {
+      console.error('Error checking record count:', countError);
+    } else {
+      console.log(`Found ${count} total records for user ${userId}`);
     }
-    
-    // Get all sessions in the date range
-    const { data, error } = await supabase
+
+    // Build our main query
+    let query = supabase
       .from('automation_sessions')
       .select('*')
-      .eq('profile_id', userId)  // Changed from user_id to profile_id
-      .gte('session_start', startDate.toISOString())
-      .lte('session_start', today.toISOString())
+      .eq('profile_id', userId)
       .order('session_start', { ascending: false });
+
+    // Remove any default limits that might be applied
+    query = query.limit(10000);
+
+    // Only apply date filters if not "all" period
+    if (period !== 'all') {
+      // Calculate the start and end date based on the requested period
+      switch(period) {
+        case 'day': {
+          // Start of today
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+          // End of today
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          break;
+        }
+        case 'week': {
+          const dayOfWeek = now.getDay();
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - dayOfWeek);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          break;
+        }
+        case 'month': {
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          break;
+        }
+        case 'year': {
+          startDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          break;
+        }
+        default: {
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        }
+      }
+
+      // Apply date range filters
+      query = query
+        .gte('session_start', startDate.toISOString())
+        .lte('session_start', endDate.toISOString());
+    }
+
+    // Execute the query
+    console.log('Executing query...');
+    let { data, error } = await query;
     
-    if (error) throw error;
+    if (error) {
+      console.error('Query error:', error);
+      throw error;
+    }
+    
+    console.log(`Query returned ${data?.length || 0} sessions`);
+    
+    // Check if we have any data at all for debugging
+    if (!data || data.length === 0) {
+      console.log('No data returned, checking alternative id field...');
+      
+      // Try with 'user_id' instead of 'profile_id' as a fallback
+      const { data: altData, error: altError } = await supabase
+        .from('automation_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .limit(10000);
+        
+      if (altError) {
+        console.error('Alternative query error:', altError);
+      } else if (altData && altData.length > 0) {
+        console.log(`Found ${altData.length} records with user_id field instead`);
+        data = altData; // Use this data instead
+      }
+    }
+    
+    // Debug first and last few records if available
+    if (data && data.length > 0) {
+      console.log('First record:', data[0]);
+      if (data.length > 1) {
+        console.log('Last record:', data[data.length-1]);
+      }
+    }
     
     // Calculate statistics
     const totalSessions = data?.length || 0;
@@ -219,35 +290,83 @@ const subscriptionService = {
       return acc;
     }, {});
     
+    // Calculate applications by day of week
+    const applicationsByDay = data?.reduce((acc, session) => {
+      if (session.session_start) {
+        const date = new Date(session.session_start);
+        const day = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+        acc[day] = (acc[day] || 0) + (session.jobs_applied || 0);
+      }
+      return acc;
+    }, {});
+    
     return {
       totalSessions,
       totalJobsApplied,
       sessionsByPlatform,
       applicationsByPlatform,
+      applicationsByDay,
       recentSessions: data || []
     };
   },
 
-  // Check if user has reached their subscription limit
-  async hasReachedLimit(userId) {
+  // Check if user has reached their subscription limit (monthly and daily per-platform)
+  async hasReachedLimit(userId, platform = null) {
     // Get current subscription
     const subscription = await this.getUserSubscription(userId);
-    
     // Get current month's total applications
     const totalApplied = await this.getCurrentMonthApplicationCount(userId);
-    
-    if (!subscription) {
-      // No subscription, assign default Basic plan limit of 30
-      return { hasReached: totalApplied >= 30, limit: 30, used: totalApplied };
+    // Get today's date range
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+    let dailyApplied = 0;
+    let dailyLimit = null;
+    if (platform) {
+      // Query automation_sessions for today and this platform
+      const { data: sessions, error } = await supabase
+        .from('automation_sessions')
+        .select('jobs_applied')
+        .eq('profile_id', userId)
+        .eq('platform', platform)
+        .gte('session_start', startOfDay.toISOString())
+        .lte('session_start', endOfDay.toISOString());
+      if (!error && sessions) {
+        dailyApplied = sessions.reduce((sum, s) => sum + (s.jobs_applied || 0), 0);
+      }
+      // Get daily limit from plan
+      if (subscription && subscription.subscription_plans) {
+        const plan = subscription.subscription_plans;
+        const key = `${platform}_daily_limit`;
+        dailyLimit = plan[key] ?? null;
+      }
     }
-    
+    if (!subscription) {
+      // No subscription, assign default Basic plan limit of 30/month, 5/day
+      return { hasReached: totalApplied >= 30, limit: 30, used: totalApplied, dailyHasReached: dailyApplied >= 5, dailyLimit: 5, dailyUsed: dailyApplied };
+    }
     // Use subscription plan limit
     const limit = subscription.subscription_plans.monthly_limit;
-    
-    return { 
-      hasReached: totalApplied >= limit, 
-      limit, 
+    // If platform and daily limit is set, check daily
+    if (platform && dailyLimit != null) {
+      return {
+        hasReached: totalApplied >= limit,
+        limit,
+        used: totalApplied,
+        dailyHasReached: dailyApplied >= dailyLimit,
+        dailyLimit,
+        dailyUsed: dailyApplied,
+        subscription
+      };
+    }
+    // Fallback to monthly only
+    return {
+      hasReached: totalApplied >= limit,
+      limit,
       used: totalApplied,
+      dailyHasReached: false,
+      dailyLimit: null,
+      dailyUsed: 0,
       subscription
     };
   },
@@ -328,6 +447,21 @@ const subscriptionService = {
     
     if (error) throw error;
     return { data, error: null };
+  },
+
+  // Update job application status
+  async updateJobStatus(jobId, newStatus) {
+    const { data, error } = await supabase
+      .from('applied_jobs')
+      .update({ 
+        application_status: newStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', jobId)
+      .select();
+    
+    if (error) throw error;
+    return data?.[0] || null;
   },
 };
 
