@@ -24,7 +24,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 
 // Import styles
 import './styles/global.css';
-import './styles/spinner.css';
+import './styles/Spinner.css';
 import { useEffect } from 'react';
 
 function PrivateRoute({ children }) {
