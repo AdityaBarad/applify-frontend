@@ -4,6 +4,7 @@ import { FiArrowLeft, FiAlertCircle, FiSettings, FiSearch, FiMapPin, FiCalendar,
 import { useAuth } from '../contexts/AuthContext'; 
 import { toast } from 'react-hot-toast';
 import '../styles/Spinner.css';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 import { supabase } from '../lib/supabaseClient'; // Import Supabase client
 
 // Helper functions for localStorage
@@ -640,7 +641,7 @@ function AutomationForm() {
         if (!apiCalledRef.current.complete) {
           apiCalledRef.current.complete = true;
           try {
-            await fetch('http://localhost:5000/api/automation-session/complete', {
+            await fetch(`${API_BASE_URL}/automation-session/complete`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -686,7 +687,7 @@ function AutomationForm() {
         if (progress.totalApplied > 0 && !apiCalledRef.current.stopped) {
           apiCalledRef.current.stopped = true;
           try {
-            await fetch('http://localhost:5000/api/automation-session/stopped', {
+            await fetch(`${API_BASE_URL}/automation-session/stopped`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

@@ -6,8 +6,8 @@ import { subscriptionService } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
-// API base URL
-const API_BASE_URL = 'http://localhost:5000/api';
+// API base URL from environment
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Hardcoded Razorpay test key - replace with your actual test key
 const RAZORPAY_KEY_ID = 'rzp_test_RA1f8hC8x7h1jI';
