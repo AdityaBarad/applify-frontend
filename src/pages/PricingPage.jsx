@@ -10,7 +10,7 @@ import axios from 'axios';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Hardcoded Razorpay test key - replace with your actual test key
-const RAZORPAY_KEY_ID = 'rzp_test_RA1f8hC8x7h1jI';
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 function PricingPage() {
   const [plans, setPlans] = useState([]);
