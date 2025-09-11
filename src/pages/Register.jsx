@@ -51,7 +51,7 @@ function Register() {
       newErrors.confirmPassword = 'Passwords do not match';
     }
     if (!acceptTerms) {
-      newErrors.acceptTerms = 'You must accept the terms and conditions';
+      newErrors.acceptTerms = 'You must accept the terms of service';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -240,11 +240,11 @@ function Register() {
               />
               <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-700">
                 I agree to the{' '}
-                <Link to="/terms" className="text-blue-600 hover:text-blue-500">
+                <Link to="/terms-of-service" className="text-blue-600 hover:text-blue-500">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
+                <Link to="/privacy-policy" className="text-blue-600 hover:text-blue-500">
                   Privacy Policy
                 </Link>
               </label>

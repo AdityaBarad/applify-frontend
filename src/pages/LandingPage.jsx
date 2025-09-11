@@ -888,8 +888,8 @@ function LandingPage() {
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
                 {/* Removed Careers */}
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms-of-service" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
               </ul>
             </div>
           </div>
@@ -901,8 +901,8 @@ function LandingPage() {
                 <p>© 2024 Applify. All rights reserved.</p>
               </div>
               <div className="flex items-center space-x-6">
-                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a>
                 <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
               </div>
             </div>

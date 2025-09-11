@@ -21,6 +21,7 @@ import AuthCallback from './pages/AuthCallback';
 import JobDatingPage from './pages/JobDatingPage';
 
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 // Import styles
 import './styles/global.css';
@@ -84,7 +85,8 @@ function App() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+
           {/* Protected dashboard routes */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>}>
             <Route index element={<AutomatePage />} />
